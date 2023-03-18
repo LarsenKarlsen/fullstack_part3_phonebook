@@ -2,6 +2,8 @@ const { request, response } = require("express");
 const express = require("express");
 const app = express();
 
+app.use(express.json())
+
 let persons = [
   { 
     "id": 1,
@@ -36,12 +38,47 @@ app.get("/api/persons", (request, response)=>{
   response.json(persons);
 });
 
+app.post("/api/persons", (request, response)=>{
+  const body = request.body
+  if (!body.name) {
+    return response.status(400).json({ 
+      error: 'name missing' 
+    })
+  } else if (!body.number) {
+    return response.status(400).json({ 
+      error: 'number missing' 
+    })
+  }
+
+  const id = (Math.random()*1000).toFixed(0)
+
+  if (persons.filter(p=>p.name === body.name).length===0){
+    const person = {id:Number(id), ...body}
+    persons = [...persons, person]
+    response.json(person)
+    return response.status(201).end()
+  } else {
+    response.json({message:`person with name ${body.name} alredy exist`})
+    return response.status(201).end()
+  }
+})
+
 app.get("/api/persons/:id", (request, response)=>{
   const id = Number(request.params.id);
   const person = persons.find(p=>p.id===id);
 
   if (person){
     return response.json(person)
+  } else {
+    response.status(404).end()
+  }
+});
+
+app.delete("/api/persons/:id", (request, response)=>{
+  const id = Number(request.params.id);
+  if (persons.find(p=>p.id===id)){
+    persons = persons.filter(p=>p.id !== id)
+    response.status(204).end()
   } else {
     response.status(404).end()
   }
