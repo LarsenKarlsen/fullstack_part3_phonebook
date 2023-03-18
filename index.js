@@ -58,7 +58,7 @@ app.post("/api/persons", (request, response)=>{
     response.json(person)
     return response.status(201).end()
   } else {
-    response.json({message:`person with name ${body.name} alredy exist`})
+    response.json({error:`person with name ${body.name} alredy exist`})
     return response.status(201).end()
   }
 })
