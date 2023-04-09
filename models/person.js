@@ -15,8 +15,19 @@ mongoose.connect(url)
   });
   
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: {
+      type: String,
+      minLength:3,
+      required: true
+    },
+    number: {
+      type: String,
+      validate: {
+        validator: (v) => /^(\d{8,})|(\d{2}-\d{6,})|(\d{2}-\d{5,})+$/.test(v),
+        message: props => `${props.value} is not a valid phone number! (valid numbers must have min length of 8 digits or match masks XX-XXXXXX(or more) or XXX-XXXXX(or more))`,
+        required: true
+        }
+      }
 });
 
 personSchema.set("toJSON", {
